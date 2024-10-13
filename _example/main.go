@@ -10,11 +10,14 @@ import (
 func main() {
 	ql := quicklog.NewQuicklog()
 
+	ql.Info("g1", "hi")
+	ql.Info("g1", "test")
 	ql.Warn("g1", "test")
 	ql.Warn("g1", "test")
 	time.Sleep(3 * time.Second)
-	fmt.Println(ql.Logs("g1")[0].TimeAgo())
-	fmt.Println(ql.Logs("g1")[0].FormattedMessage("EST", true))
+	for _, l := range ql.Logs("g1") {
+		fmt.Println(l.FormattedMessage("EST", true))
+	}
 
 	ql.Warn("g1", "test2")
 	time.Sleep(10 * time.Second)

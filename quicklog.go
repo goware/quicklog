@@ -63,7 +63,7 @@ type logEntry struct {
 }
 
 func (w *quicklog) Info(group, message string, v ...any) {
-	w.log("WARN", group, message, v...)
+	w.log("INFO", group, message, v...)
 }
 
 func (w *quicklog) Warn(group, message string, v ...any) {
@@ -95,7 +95,7 @@ func (w *quicklog) log(level, group, message string, v ...any) {
 	// First check if the message is already in the log, and if so, increment the count
 	// and update the time
 	for i, entry := range g {
-		if entry.message == msg {
+		if entry.message == msg && entry.level == level {
 			entry.count++
 			entry.time = time.Now().UTC()
 			g[i] = entry
@@ -115,6 +115,7 @@ func (w *quicklog) log(level, group, message string, v ...any) {
 		message: msg,
 		level:   level,
 		time:    time.Now().UTC(),
+		count:   1,
 	}
 	newG[0] = newEntry
 	if len(g) > 0 {
@@ -222,9 +223,9 @@ func (l logEntry) FormattedMessage(timezone string, withExactTime ...bool) strin
 	}
 	var out string
 	if len(withExactTime) > 0 && withExactTime[0] {
-		out = fmt.Sprintf("%s - %s", l.time.In(loc).Format(time.RFC822), l.message)
+		out = fmt.Sprintf("%s - [%s] %s", l.time.In(loc).Format(time.RFC822), l.level, l.message)
 	} else {
-		out = fmt.Sprintf("%s - %s", l.TimeAgo(timezone), l.message)
+		out = fmt.Sprintf("%s - [%s] %s", l.TimeAgo(timezone), l.level, l.message)
 	}
 	if l.count > 1 {
 		return fmt.Sprintf("%s [x%d]", out, l.count)
