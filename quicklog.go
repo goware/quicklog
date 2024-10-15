@@ -2,6 +2,7 @@ package quicklog
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -100,6 +101,9 @@ func (w *quicklog) log(level, group, message string, v ...any) {
 			entry.time = time.Now().UTC()
 			g[i] = entry
 			w.logs[group] = g
+			sort.Slice(g, func(i, j int) bool {
+				return g[i].time.After(g[j].time)
+			})
 			return
 		}
 	}
